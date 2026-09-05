@@ -1,134 +1,92 @@
-# Signal Journey Code Map
+# Signal Journey Map — R4_F33
 
-## 1 — Source truth
+Canonical source identity:
 
-### `01_source/live_sniper_source_io.py`
-Low-level source reading boundary and file-read behavior.
+`30ac5a9844c5b929ba4a5616a9d0f821bba704fad445229c50a63a3cb3b025ae`
 
-### `01_source/source_generation_identity.py`
-Defines physical/content generation identity so a file rewrite is not confused with the previously acknowledged generation.
+## End-to-end path
 
-### `01_source/live_source_bar_freshness.py`
-Bar-time/freshness authority.
+```text
+MetaStock / source file generation
+  -> live_sniper_source_io / source_generation_identity
+  -> live_sniper_source_runtime
+  -> freshness / quarantine / resolution / supervisor
+  -> full_source_observation_recorder
+  -> live_source_processing_scheduler
+  -> source lease + durable admission continuation
+  -> engine Stage-0 / DataApi boundary
+  -> Probability work partition / IPC / worker runner
+  -> GANN20 model boundary (PUBLIC STUB ONLY)
+  -> completion + authority + late-result guards
+  -> pulse acceptance / state engine
+  -> GANN20 episode ledger / seal authority
+  -> pulse_tick_tape + terminal_truth_authority
+  -> lifecycle / decision authority
+  -> durable UI outbox / official truth / projection
+```
 
-### `01_source/live_sniper_source_priority.py`
-Priority classification for source work.
+## 1. Physical/source authority
+Start in `01_source/`.
 
-### `01_source/live_source_processing_scheduler.py`
-Bounded scheduling / protected processing capacity.
+Trace:
+- physical generation identity;
+- partial-write/rewrite handling;
+- bar freshness;
+- source mapping / quarantine / resolution;
+- SOURCE_PRIORITY ordering;
+- construction and selection of `SourceProcessingTask`.
 
-### `01_source/live_sniper_source_runtime.py`
-Owns an already-read source generation through durable processing/ACK or requeue.
+R4-specific source/scheduler authority additions are also under `08_r4_f33_authority/`.
 
----
+## 2. Observation -> durable admission
+Read `02_observation/`, then the R4 authority files for lease/admission identity.
 
-## 2 — Durable observation and episode identity
+Questions:
+- Is one immutable physical observation represented once?
+- Is durable debt preserved when processing cannot continue?
+- Can a lease close without a corresponding open, or remain open after terminal fate?
+- Can a later physical generation be rebound to an older logical episode?
 
-### `02_observation/full_source_observation_recorder.py`
-Creates/records the immutable source-observation lineage used by later probability and lifecycle stages.
+## 3. Probability seam
+Read `03_signal_probability/` and `08_r4_f33_authority/`.
 
-### `02_observation/episode_identity_v1.py`
-Canonical episode identity contract.
+The trained model is intentionally absent. The surrounding production path is reviewable:
+- work creation;
+- parent resolution authority;
+- request lineage;
+- IPC payload;
+- worker attempt/result;
+- completion accounting;
+- timeout / late-result rejection;
+- acceptance and state transition.
 
----
+### F32 / F33 focus
+- US: parent resolution authority must be non-empty and fail closed.
+- non-US: inherited Probability IPC compatibility must not be broken by injecting an invalid empty authority keyword.
 
-## 3 — Cross, probability and pulse birth
+Selected regression tests are published in `07_r4_f33_review_tests/`.
 
-### `03_signal_probability/pulse_state_engine.py`
-Incremental RSIScaled/VAR3 pulse/cross state.
+## 4. Episode / seal lifecycle
+Read `04_lifecycle/`.
 
-### `03_signal_probability/pulse_acceptance_engine.py`
-Admission/acceptance layer for pulse candidates.
+Check:
+- immutable episode identity;
+- first-cross / sealed-score lineage;
+- restart / high-water semantics;
+- R1 / seal ordering;
+- terminal isolation;
+- radar lane side effects and stale-epoch fencing.
 
-### `03_signal_probability/pulse_probability_stage_contract.py`
-Defines the probability stage and authoritative fields used downstream.
+## 5. Terminal -> UI
+Read `05_terminal_projection/`.
 
-### `03_signal_probability/probability_causal_worker_bridge.py`
-Causal worker handoff.
+Invariant to challenge:
+**no UI/decision projection may outrun or contradict durable terminal authority.**
 
-### `03_signal_probability/probability_worker_runner.py`
-Probability worker execution boundary.
+Test crash, retry, SQLite contention, queue saturation, outbox failure and replay/resurrection reasoning against that invariant.
 
-### `03_signal_probability/probability_hot_path.py`
-Hot-path probability orchestration and completion handling.
+## 6. Stable-vs-current mirror identity
+Read `R4_F33_MIRROR_STATUS.md` before treating any file as current. The public mirror intentionally preserves prior files only where they are byte-identical to R4_F33 or where the current R4 replacement is explicitly supplied in the R4 authority/review directories.
 
-### `03_signal_probability/gann20_probability_model.py`
-**PUBLIC STUB ONLY.** The real trained model implementation is deliberately omitted.
-
-### `03_signal_probability/live_pulse_seal_engine.py`
-Central live pulse/seal engine: provisional/official display semantics, probability linkage, sealed-bar transitions and lifecycle integration.
-
----
-
-## 4 — R1 and decision lifecycle
-
-### `04_lifecycle/pulse_tick_tape.py`
-Carries observation lineage through price evolution, R1 events, target-consumed events and terminal intents.
-
-### `04_lifecycle/durable_r1_lifecycle.py`
-Canonical R1 state machine: R1 active/lost/regain, R50 tracking, R100 completion and terminal presentation state.
-
-### `04_lifecycle/fresh_opportunity_queue.py`
-Defines whether an episode is still an actionable opportunity and whether the target/entry window has been consumed.
-
-### `04_lifecycle/decision_layer.py`
-Decision/policy boundary.
-
-### `04_lifecycle/radar_contract_policy.py`
-Radar policy contract.
-
-### `04_lifecycle/radar_probability_lane_contract.py`
-Probability-lane authority contract.
-
-### `04_lifecycle/gann20_episode_ledger.py`
-Durable episode event ledger.
-
-### `04_lifecycle/gann20_episode_truth_writer.py`
-Writes episode truth events/projections from authoritative lifecycle state.
-
----
-
-## 5 — Terminal truth, seal and UI projection
-
-### `05_terminal_projection/terminal_truth_authority.py`
-Durable/idempotent terminal authority.
-
-### `05_terminal_projection/session_historical_seal.py`
-Historical evidence epoch/seal lifecycle and durable session sealing.
-
-### `05_terminal_projection/r1693_4_signal_close_authority.py`
-Signal-close authority.
-
-### `05_terminal_projection/gann20_event_truth_projection.py`
-GANN20 event projection fields.
-
-### `05_terminal_projection/r1_event_truth_projection.py`
-R1 event projection.
-
-### `05_terminal_projection/durable_ui_patch_outbox.py`
-Durable UI delivery debt/outbox.
-
-### `05_terminal_projection/live_ui_delivery_contract.py`
-UI delivery acknowledgment/failure contract.
-
----
-
-## 6 — Contracts to read alongside the path
-
-- `06_contracts/gann20_episode_contract.py`
-- `06_contracts/live_sniper_contract.py`
-- `06_contracts/live_episode_truth_contract.py`
-- `06_contracts/m30_sniper_birth_seal_contract.py`
-- `06_contracts/sealed_close_lineage_contract.py`
-- `06_contracts/normalized_gann.py`
-
-## Suggested adversarial review order
-
-1. Pick one `source_observation_id`.
-2. Trace its generation identity and durable admission.
-3. Verify probability cannot bind to another observation/bar.
-4. Verify pulse/episode identity remains stable.
-5. Verify R1 lifecycle cannot move backward illegally.
-6. Verify R50/target-consumed removes entry actionability while episode may continue for R100.
-7. Verify first terminal is durable/idempotent and survives restart.
-8. Verify projection/UI cannot become the authority over the durable ledger.
+## 7. What this repository cannot prove
+It does not prove model quality, real Windows performance, physical disk behavior, or live-market acceptance. Those remain separate evidence authorities.
