@@ -11,7 +11,7 @@ import math
 import re
 from typing import Any, Dict, Iterable, Mapping, Tuple
 
-VERSION = "A96_PULSE_PROBABILITY_STAGE_CONTRACT_V1"
+VERSION = "A4_2_14_H12H14H9_STRUCTURED_PROBABILITY_AUTHORITY_V1"
 
 
 def _finite(value: Any) -> float:
@@ -34,29 +34,48 @@ def _text(row: Mapping[str, Any], keys: Iterable[str]) -> str:
     return " | ".join(str((row or {}).get(key)) for key in keys if (row or {}).get(key) is not None)
 
 
-def extract_probability(row: Mapping[str, Any], *, prefer_sealed: bool) -> Tuple[float, float]:
-    source = row or {}
+def _probability_keys(*, prefer_sealed: bool) -> tuple[tuple[str, ...], tuple[str, ...]]:
     if prefer_sealed:
-        p50_keys = (
-            "p50_sealed", "p50_final", "gann20_p_r50_sealed_pct",
-            "gann20_probability_r50_sealed", "sealed_p50_pct",
-            "gann20_probability_r50", "gann20_p_r50_pct", "p50_frozen",
+        return (
+            (
+                "p50_sealed", "p50_final", "gann20_p_r50_sealed_pct",
+                "gann20_probability_r50_sealed", "sealed_p50_pct",
+                "gann20_probability_r50", "gann20_p_r50_pct", "p50_frozen",
+            ),
+            (
+                "p100_sealed", "p100_final", "gann20_p_r100_sealed_pct",
+                "gann20_probability_r100_sealed", "sealed_p100_pct",
+                "gann20_probability_r100", "gann20_p_r100_pct", "p100_frozen",
+            ),
         )
-        p100_keys = (
-            "p100_sealed", "p100_final", "gann20_p_r100_sealed_pct",
-            "gann20_probability_r100_sealed", "sealed_p100_pct",
-            "gann20_probability_r100", "gann20_p_r100_pct", "p100_frozen",
-        )
-    else:
-        p50_keys = (
+    return (
+        (
             "p50_at_first_cross", "p50_birth", "p50_live_first", "p50_live",
             "gann20_probability_r50", "gann20_p_r50_pct", "p50_frozen",
-        )
-        p100_keys = (
+        ),
+        (
             "p100_at_first_cross", "p100_birth", "p100_live_first", "p100_live",
             "gann20_probability_r100", "gann20_p_r100_pct", "p100_frozen",
-        )
-    p50, p100 = _first(source, p50_keys), _first(source, p100_keys)
+        ),
+    )
+
+
+def extract_probability_authoritative(row: Mapping[str, Any], *, prefer_sealed: bool) -> Tuple[float, float]:
+    """Return only structured numeric probability facts.
+
+    Display text is intentionally outside this authority path.  A label such as
+    ``R50/20: 88%`` can be rendered by the UI but can never create/arm/update a
+    candidate, seal, R1 watch, execution decision or terminal truth.
+    """
+    source = row or {}
+    p50_keys, p100_keys = _probability_keys(prefer_sealed=prefer_sealed)
+    return _first(source, p50_keys), _first(source, p100_keys)
+
+
+def extract_probability_display_only(row: Mapping[str, Any], *, prefer_sealed: bool) -> Tuple[float, float]:
+    """Display/diagnostic helper; text-derived values are non-authoritative."""
+    source = row or {}
+    p50, p100 = extract_probability_authoritative(source, prefer_sealed=prefer_sealed)
     text = _text(source, (
         "gann20_probability_label", "probability", "probability_text",
         "reason", "var3_gann_category_text", "action",
@@ -70,6 +89,11 @@ def extract_probability(row: Mapping[str, Any], *, prefer_sealed: bool) -> Tuple
         if match:
             p100 = _finite(match.group(1))
     return p50, p100
+
+
+def extract_probability(row: Mapping[str, Any], *, prefer_sealed: bool) -> Tuple[float, float]:
+    """Backward name retained, but authority semantics are now structured-only."""
+    return extract_probability_authoritative(row, prefer_sealed=prefer_sealed)
 
 
 def _reason_level(row: Mapping[str, Any], name: str) -> float:
@@ -109,4 +133,4 @@ def extract_levels(row: Mapping[str, Any], *, prefer_sealed: bool) -> Dict[str, 
     }
 
 
-__all__ = ["VERSION", "extract_probability", "extract_levels"]
+__all__ = ["VERSION", "extract_probability", "extract_probability_authoritative", "extract_probability_display_only", "extract_levels"]
