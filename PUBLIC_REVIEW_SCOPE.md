@@ -1,28 +1,35 @@
-# Public Review Scope
+# Public Review Scope — R4_F33
 
-## Included authority path
+This mirror is derived from R4_F33 Canonical Exact:
 
-`Source DAT generation`
-→ `source read/freshness/generation identity`
-→ `durable source observation`
-→ `pulse/cross state`
-→ `probability stage boundary`
-→ `P50/P100 adapter (redacted model implementation)`
-→ `pulse birth / sealed transition`
-→ `R1 lifecycle`
-→ `opportunity/decision policy`
-→ `R50/R100/terminal authority`
-→ `historical seal / durable projections`
-→ `UI delivery outbox`
+`30ac5a9844c5b929ba4a5616a9d0f821bba704fad445229c50a63a3cb3b025ae`
 
-## Redaction boundary
-Only the statistical model implementation is replaced. The surrounding code remains reviewable so the reviewer can verify:
-- when the model is called;
-- what lineage must accompany the call;
-- how a missing/unavailable model fails;
-- how P50/P100 are admitted and frozen;
-- how R1, R50/R100 and terminal truth consume the result;
-- how projection/UI are downstream of durable truth.
+It is intentionally **not byte-identical to the release** because sensitive/model/runtime material is excluded.
 
-## Not a production artifact
-Imports outside this folder may intentionally be unresolved. This mirror is for architectural and causal review, not execution.
+## What the reviewer may treat as production control-flow evidence
+
+Included Python modules are copied from the R4_F33 production source when marked current in `R4_F33_MIRROR_STATUS.md`. Files whose R4 bytes are unchanged from the previous public mirror remain in place with their original Git blob identity. The GANN20 model file is the one explicit implementation stub.
+
+The purpose is to expose:
+- source and physical-generation handling;
+- scheduler, coalescing, reserve and same-key behavior;
+- durable admission / lease accounting;
+- Probability request/IPC/worker/result authority;
+- episode, seal, terminal and restart identity;
+- decision and UI projection boundaries.
+
+## Reviewer must not infer
+- model quality, feature correctness or calibration quality;
+- Windows timing/performance from this repository alone;
+- live-market success or Live GO;
+- absence of a bug merely because a selected public test passes.
+
+## Missing material by design
+- weights/models and serialized model artifacts;
+- secret storage and credential values;
+- provider/broker/account configuration;
+- live evidence and historical market datasets;
+- packaging, full Court Floor and Windows acceptance bundles.
+
+## Security rule
+If an included module refers to API-key, provider or secret-vault interfaces, those are architectural references only. No secret value or vault content is intentionally published.

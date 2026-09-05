@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pkl
+*.joblib
+*.onnx
+*.model
+*.weights
+*.key
+*.pem
+.env
+.env.*
+*.sqlite
+*.sqlite3
+*.db
+AinAcceptance/
+datainfo/live_tick_research/
