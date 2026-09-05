@@ -1,38 +1,42 @@
-# Ain AlMudharib H8 — Public Signal Journey Review Mirror
+# Ain Al-Mudharib R4_F33 — Public Signal Journey Review Mirror
 
-This repository folder is a **sanitized architectural/code-review mirror** of the Saudi H8 signal journey.
-It is intentionally **not runnable as a production release**.
+This repository is a **sanitized, non-runnable code-review mirror** of the current R4_F33 signal journey.
+It is intended for an external expert to trace the production plumbing from physical/source observation to scheduling, durable admission, Probability, lifecycle, terminal truth, decision and UI projection.
 
-Source candidate SHA-256:
-`ae2edc688800949152240c9e27564f354650173a99ea94a15d794cc7d708e91d`
+Source Canonical Exact SHA-256:
+`30ac5a9844c5b929ba4a5616a9d0f821bba704fad445229c50a63a3cb3b025ae`
 
-## Purpose
-Allow an external reviewer to inspect the real plumbing and lifecycle of a signal from source ingestion to terminal/UI projection without publishing proprietary model weights, model recipes/calibration, secrets, live session data, credentials, or execution connectors.
+Source release status: **STRICT PRELIVE; Formal/Full/External offline gates passed; Windows Live pending.**
+
+## Review rule
+This is a review mirror, not a runnable release. Included production modules are published only to expose control flow, identities, queues, authorities, durable truth and projection behavior. The GANN20 model implementation itself is intentionally redacted.
 
 ## Start here
 1. `SIGNAL_JOURNEY_MAP.md`
 2. `PUBLIC_REVIEW_SCOPE.md`
-3. `01_source/`
-4. `02_observation/`
-5. `03_signal_probability/`
-6. `04_lifecycle/`
-7. `05_terminal_projection/`
-8. `06_contracts/`
+3. `REVIEW_QUESTIONS.md`
+4. `R4_F33_MIRROR_STATUS.md`
+5. `01_source/`
+6. `02_observation/`
+7. `03_signal_probability/`
+8. `04_lifecycle/`
+9. `05_terminal_projection/`
+10. `06_contracts/`
+11. `07_r4_f33_review_tests/`
+12. `08_r4_f33_authority/`
 
-## Important redaction
-The production `gann20_probability_model.py` is **not published**. It is replaced with a public interface stub at:
-`03_signal_probability/gann20_probability_model.py`
+## Intentionally excluded
+- trained model files / trees / weights / serialized model artifacts;
+- proprietary feature recipe and production calibration coefficients;
+- secrets, API keys, credentials and secret-vault contents;
+- broker/account connectors and account configuration;
+- live-session evidence, historical market datasets and user-specific paths;
+- complete release/acceptance packages and offline dependency bundles.
 
-The stub documents the integration contract only: P50/P100 inputs/outputs, model availability/fail-closed behavior, feature stage boundary, score lineage expectations, and frozen episode semantics. It contains no trained trees, weights, proprietary feature recipe, or calibration coefficients.
+`03_signal_probability/gann20_probability_model.py` remains an explicit non-scoring public stub.
 
-## What is intentionally excluded
-- Trained model files / weights / trees.
-- Production model configuration and calibration coefficients.
-- Secrets, API keys, credentials, secret vaults.
-- Broker/connectors and account configuration.
-- Live session evidence and user-specific file paths.
-- Historical market datasets.
-- Full release tooling and acceptance packages.
+## Primary review objective
+Trace whether one source observation can be lost, duplicated, delayed, rebound to the wrong physical generation/bar/episode, scheduled under the wrong authority, scored against stale context, resurrected after terminal state, or projected to decision/UI without matching durable truth.
 
-## Review question
-Trace whether one source observation can be lost, duplicated, delayed, rebound to the wrong bar/episode, resurrected after terminal state, or projected to UI without the corresponding durable authority.
+## Important
+A PASS in this mirror is not Live GO. The authoritative release remains the R4_F33 Canonical Exact identified above; Windows Live acceptance is still a separate gate.
