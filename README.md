@@ -12,18 +12,20 @@ Source release status: **STRICT PRELIVE; Formal/Full/External offline gates pass
 This is a review mirror, not a runnable release. Included production modules are published only to expose control flow, identities, queues, authorities, durable truth and projection behavior. The GANN20 model implementation itself is intentionally redacted.
 
 ## Start here
-1. `SIGNAL_JOURNEY_MAP.md`
-2. `PUBLIC_REVIEW_SCOPE.md`
-3. `REVIEW_QUESTIONS.md`
-4. `R4_F33_MIRROR_STATUS.md`
-5. `01_source/`
-6. `02_observation/`
-7. `03_signal_probability/`
-8. `04_lifecycle/`
-9. `05_terminal_projection/`
-10. `06_contracts/`
-11. `07_r4_f33_review_tests/`
-12. `08_r4_f33_authority/`
+1. `EXPERT_START_HERE.md`
+2. `R4_F33_MIRROR_STATUS.md`
+3. `R4_F33_CURRENT_FUNCTION_INDEX.md`
+4. `SIGNAL_JOURNEY_MAP.md`
+5. `PUBLIC_REVIEW_SCOPE.md`
+6. `REVIEW_QUESTIONS.md`
+7. `01_source/`
+8. `02_observation/`
+9. `03_signal_probability/`
+10. `04_lifecycle/`
+11. `05_terminal_projection/`
+12. `06_contracts/`
+13. `07_r4_f33_review_tests/`
+14. `08_r4_f33_authority/`
 
 ## Intentionally excluded
 - trained model files / trees / weights / serialized model artifacts;
