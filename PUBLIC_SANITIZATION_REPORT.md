@@ -1,28 +1,30 @@
-# Public Sanitization Report
+# Public Sanitization Report — R4_F33 Mirror
 
-## Source
-Saudi H8 Windows retest candidate.
-Source ZIP SHA-256:
-`ae2edc688800949152240c9e27564f354650173a99ea94a15d794cc7d708e91d`
+Canonical source identity:
+`30ac5a9844c5b929ba4a5616a9d0f821bba704fad445229c50a63a3cb3b025ae`
 
-## Included
-Selected production plumbing/lifecycle modules covering source ingestion, source-observation lineage, pulse/probability orchestration, R1 lifecycle, opportunity state, terminal truth, historical seal, and UI delivery contracts.
+This repository is intentionally a **sanitized review mirror**, not the Canonical Exact.
 
-## Explicitly redacted/excluded
-- Real `gann20_probability_model.py` implementation.
-- Trained model artifacts and production model configuration.
-- Proprietary model feature recipe and calibration values.
-- Secret vault / credentials / API keys.
-- Broker or account connectors.
-- Live-session evidence and historical datasets.
-- User-specific filesystem paths.
+## Explicitly excluded
+- trained GANN20 model files / weights / trees / serialized artifacts;
+- proprietary feature recipe and production calibration coefficients;
+- secret-vault contents, API keys, credentials and account configuration;
+- live-session evidence and historical market datasets;
+- user-specific filesystem paths;
+- complete Production/Acceptance packages and dependency bundles.
 
-## Model replacement
-The real model module is replaced by a non-scoring public stub that preserves the integration function names used by the surrounding code. It deliberately fails if asked to score.
+## Model boundary
+`03_signal_probability/gann20_probability_model.py` is an explicit non-scoring stub. It exposes only the surrounding integration shape needed for review.
 
-## Static checks performed on the selected mirror
-- Python `compileall`: PASS.
-- High-confidence secret-pattern scan over selected text files: no matching credentials found.
-- Explicit model artifacts: absent.
+## Current-source disclosure
+The original public H8 mirror was compared against R4_F33. Files verified byte-identical remain valid current review evidence. Files whose bytes changed are explicitly marked as historical/not-current in `R4_F33_MIRROR_STATUS.md` and their identities are recorded in `R4_F33_CHANGED_FILE_IDENTITIES.md`.
 
-This is a review mirror, not a claim that arbitrary future edits are safe for public release.
+Current R4 review-relevant authority seams and F32/F33 regression tests have been added under:
+- `08_r4_f33_authority/`
+- `07_r4_f33_review_tests/`
+
+## Public-release safety
+No Live GO, model IP, secret value, live evidence or account credential is intentionally represented by this mirror. Any apparent secret/provider variable name in code is an interface/reference, not a published credential value.
+
+## Review honesty
+This mirror is optimized for end-to-end control-flow, identity, queue, durable-truth and projection review. It is not sufficient evidence for model quality, physical Windows performance, or release acceptance.
